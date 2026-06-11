@@ -1,0 +1,32 @@
+name: gym_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+    # Gestor de estado
+  flutter_riverpod: ^2.5.1  
+  
+  # Alertas (Sonido y hardware)
+  audioplayers: ^5.2.1      # Para el "beep" al cambiar de fase
+  vibration: ^3.1.8         # Para la respuesta háptica
+  
+  # Mantener pantalla encendida
+  wakelock_plus: ^1.2.8     # La versión moderna de wakelock
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/beep_bajo.mp3
+    - assets/final.mp3
