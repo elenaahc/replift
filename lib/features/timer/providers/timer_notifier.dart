@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gym_app/main.dart';
 import 'package:wakelock_plus/wakelock_plus.dart'; // Importamos wakelock
 import '../services/alert_service.dart';
 import 'timer_state.dart';
@@ -8,13 +9,23 @@ class TimerNotifier extends Notifier<TimerState> {
   Timer? _timer;
   late final AlertService _alertService;
 
-  int workTime = 10;
-  int restTime = 10;
-  int initialSets = 2;
+  // Ahora usamos "late" porque los inicializaremos en el build
+  late int workTime;
+  late int restTime;
+  late int initialSets;
 
   @override
   TimerState build() {
     _alertService = AlertService(); // Inicializamos el servicio de alertas
+
+    // 1. Leemos las preferencias directamente desde el Provider
+    final prefs = ref.read(sharedPrefsProvider);
+
+    // 2. Cargamos los datos. Si es nulo (primera vez que abres la app), usamos un valor por defecto
+    workTime = prefs.getInt('workTime') ?? 60;
+    restTime = prefs.getInt('restTime') ?? 60;
+    initialSets = prefs.getInt('initialSets') ?? 4;
+
     return TimerState(
       timeRemaining: workTime,
       isWorkPhase: true,
@@ -22,6 +33,7 @@ class TimerNotifier extends Notifier<TimerState> {
     );
   }
 
+  // 3. Actualizamos la función para que guarde físicamente los datos
   void updateSettings({
     required int work,
     required int rest,
@@ -30,7 +42,14 @@ class TimerNotifier extends Notifier<TimerState> {
     workTime = work;
     restTime = rest;
     initialSets = sets;
-    resetTimer(); // Reinicia el estado con los nuevos valores
+
+    final prefs = ref.read(sharedPrefsProvider);
+    // Guardamos en la memoria persistente
+    prefs.setInt('workTime', workTime);
+    prefs.setInt('restTime', restTime);
+    prefs.setInt('initialSets', initialSets);
+
+    resetTimer();
   }
 
   void startTimer() {

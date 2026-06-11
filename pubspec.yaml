@@ -20,6 +20,8 @@ dependencies:
   # Mantener pantalla encendida
   wakelock_plus: ^1.2.8     # La versión moderna de wakelock
 
+  shared_preferences: ^2.2.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
