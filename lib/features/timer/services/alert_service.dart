@@ -23,7 +23,7 @@ class AlertService {
   // Alerta corta para cambio de fase (Trabajo <-> Descanso)
   Future<void> playPhaseChangeAlert() async {
     // 1. Vibración: Dos pulsos cortos
-    if (await Vibration.hasVibrator() ?? false) {
+    if (await Vibration.hasVibrator()) {
       Vibration.vibrate(pattern: [0, 200, 100, 200]);
     }
 
@@ -34,7 +34,7 @@ class AlertService {
   // Alerta larga para cuando terminas todos los sets
   Future<void> playRoutineCompletedAlert() async {
     // 1. Vibración: Una vibración larga e intensa
-    if (await Vibration.hasVibrator() ?? false) {
+    if (await Vibration.hasVibrator()) {
       Vibration.vibrate(duration: 1000);
     }
 
