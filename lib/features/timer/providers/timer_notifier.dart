@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gym_app/features/timer/providers/stats_provider.dart';
 import 'package:gym_app/main.dart';
 import 'package:wakelock_plus/wakelock_plus.dart'; // Importamos wakelock
 import '../services/alert_service.dart';
@@ -108,8 +109,13 @@ class TimerNotifier extends Notifier<TimerState> {
           setsRemaining: nextSets,
         );
       } else {
-        // Fin de la rutina completa -> Esta sí la dejamos para que suene distinto al final
+        // Fin de la rutina completa
         _alertService.playRoutineCompletedAlert();
+
+        // ¡NUEVO! Le sumamos 1 a tu progreso mensual
+        ref.read(statsProvider.notifier).addCompletedRoutine();
+        // Fin de la rutina completa -> Esta sí la dejamos para que suene distinto al final
+
         pauseTimer();
         resetTimer();
       }

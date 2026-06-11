@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gym_app/features/timer/presentation/widgets/settings_modal.dart';
+import 'package:gym_app/features/timer/providers/stats_provider.dart';
 import 'package:gym_app/features/timer/providers/timer_notifier.dart';
 
 class TimerScreen extends ConsumerWidget {
@@ -8,10 +9,65 @@ class TimerScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Más adelante reemplazaremos estos valores estáticos con ref.watch()
     // 1. Escuchamos el estado global de nuestro Provider
     final timerState = ref.watch(timerProvider);
+    final stats = ref.watch(statsProvider);
 
+    // ¡NUEVO! Escuchador de eventos únicos (como llegar a la meta)
+    ref.listen<MonthlyStats>(statsProvider, (previous, next) {
+      // Si justo acaba de llegar a la meta de 50:
+      if (next.routinesCompleted == next.targetRoutines &&
+          (previous == null ||
+              previous.routinesCompleted < next.targetRoutines)) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.grey[900],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            title: const Center(
+              child: Text("🏆", style: TextStyle(fontSize: 60)),
+            ),
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "¡Meta Mensual Alcanzada!",
+                  style: TextStyle(
+                    color: Colors.greenAccent,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  "Has completado 50 rutinas este mes. Tienes la disciplina necesaria para resistir una gira mundial completa. ¡A celebrar!",
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            actions: [
+              Center(
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.greenAccent,
+                    foregroundColor: Colors.black,
+                  ),
+                  child: const Text(
+                    "¡A SEGUIR ASÍ!",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    });
     // 2. Definimos las variables que tu diseño está pidiendo
     final isWorkPhase = timerState.isWorkPhase;
 
@@ -150,6 +206,42 @@ class TimerScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Barra de progreso mensual
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Desafío Mensual",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "${stats.routinesCompleted} / ${stats.targetRoutines}",
+                            style: const TextStyle(
+                              color: Colors.greenAccent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      LinearProgressIndicator(
+                        value: (stats.routinesCompleted / stats.targetRoutines)
+                            .clamp(0.0, 1.0), // Porcentaje de llenado
+                        backgroundColor: Colors.grey[900],
+                        color: Colors.greenAccent,
+                        minHeight: 8,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ],
                   ),
                 ],
               ),
