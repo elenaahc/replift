@@ -132,7 +132,9 @@ class TimerScreen extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 48,
                   fontWeight: FontWeight.w900,
-                  color: isWorkPhase ? Colors.redAccent : Colors.greenAccent,
+                  color: isWorkPhase
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.secondary,
                   letterSpacing: 4,
                 ),
               ),
@@ -162,8 +164,7 @@ class TimerScreen extends ConsumerWidget {
                       vertical: 16,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors
-                          .grey[900], // Gris oscuro para hacer contraste con el fondo negro
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: Text(
@@ -192,8 +193,11 @@ class TimerScreen extends ConsumerWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isRunning
-                            ? Colors.grey[800]
-                            : Colors.white,
+                            ? Theme.of(context)
+                                  .colorScheme
+                                  .surface // Fondo pausado
+                            : Colors
+                                  .white, // El blanco se ve bien en todos los temas
                         foregroundColor: isRunning
                             ? Colors.white
                             : Colors.black,
@@ -225,8 +229,8 @@ class TimerScreen extends ConsumerWidget {
                           ),
                           Text(
                             "${stats.routinesCompleted} / ${stats.targetRoutines}",
-                            style: const TextStyle(
-                              color: Colors.greenAccent,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -236,8 +240,8 @@ class TimerScreen extends ConsumerWidget {
                       LinearProgressIndicator(
                         value: (stats.routinesCompleted / stats.targetRoutines)
                             .clamp(0.0, 1.0), // Porcentaje de llenado
-                        backgroundColor: Colors.grey[900],
-                        color: Colors.greenAccent,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        color: Theme.of(context).colorScheme.secondary,
                         minHeight: 8,
                         borderRadius: BorderRadius.circular(4),
                       ),

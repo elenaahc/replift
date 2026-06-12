@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gym_app/core/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme.dart';
 import 'features/timer/presentation/screens/timer_screen.dart';
@@ -27,15 +28,20 @@ void main() async {
   );
 }
 
-class GymTimerApp extends StatelessWidget {
+class GymTimerApp extends ConsumerWidget {
+  // <-- Ahora es ConsumerWidget
   const GymTimerApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. Escuchamos qué Era está activa
+    final currentEra = ref.watch(themeProvider);
+
     return MaterialApp(
       title: 'Gym Timer',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      // 2. Le inyectamos la paleta de colores de esa Era
+      theme: AppThemes.getTheme(currentEra),
       home: const TimerScreen(),
     );
   }

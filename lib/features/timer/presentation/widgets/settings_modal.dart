@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gym_app/core/theme.dart';
+import 'package:gym_app/core/theme_provider.dart';
 import '../../providers/timer_notifier.dart';
 
 class SettingsModal extends ConsumerStatefulWidget {
@@ -38,7 +40,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
         Text(
           title,
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             color: accentColor,
           ),
@@ -60,7 +62,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
               child: Text(
                 ":",
                 style: TextStyle(
-                  fontSize: 48,
+                  fontSize: 40,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -93,14 +95,14 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
           onPressed: onInc,
           icon: const Icon(
             Icons.keyboard_arrow_up,
-            size: 56,
+            size: 50,
             color: Colors.white70,
           ),
         ),
         Text(
           value.toString().padLeft(2, '0'),
           style: const TextStyle(
-            fontSize: 48,
+            fontSize: 40,
             fontWeight: FontWeight.bold,
             color: Colors.white,
             fontFeatures: [FontFeature.tabularFigures()],
@@ -110,7 +112,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
           onPressed: onDec,
           icon: const Icon(
             Icons.keyboard_arrow_down,
-            size: 56,
+            size: 50,
             color: Colors.white70,
           ),
         ),
@@ -127,7 +129,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
           const Text(
             "SERIES (SETS)",
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white70,
             ),
@@ -142,7 +144,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
                 }),
                 icon: const Icon(
                   Icons.remove_circle_outline,
-                  size: 48,
+                  size: 40,
                   color: Colors.white54,
                 ),
               ),
@@ -151,7 +153,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
                 child: Text(
                   _sets.toString(),
                   style: const TextStyle(
-                    fontSize: 48,
+                    fontSize: 40,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -161,7 +163,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
                 onPressed: () => setState(() => _sets += 1),
                 icon: const Icon(
                   Icons.add_circle_outline,
-                  size: 48,
+                  size: 40,
                   color: Colors.white54,
                 ),
               ),
@@ -177,7 +179,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
     return Container(
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: SingleChildScrollView(
@@ -193,12 +195,69 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
               ),
             ),
             const SizedBox(height: 5),
+            // Selector de Eras
+            Consumer(
+              builder: (context, ref, child) {
+                final currentEra = ref.watch(themeProvider);
+                return SingleChildScrollView(
+                  // <-- ¡Esta es la clave!
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center, // Cambiamos a center
+                    children: ThemeEra.values.map((era) {
+                      final isSelected = currentEra == era;
+                      return Padding(
+                        // Agregamos un poco de espacio entre chips
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: GestureDetector(
+                          onTap: () =>
+                              ref.read(themeProvider.notifier).changeTheme(era),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withValues(alpha: 0.2)
+                                  : Colors.transparent,
+                              border: Border.all(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.white24,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              era.name.toUpperCase(),
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.white54,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 10),
 
             // Selectores apilados verticalmente para darles mucho espacio táctil
             _buildTimeSelector(
               "TIEMPO DE TRABAJO",
               _workTime,
-              Colors.redAccent,
+              Theme.of(context).colorScheme.primary,
               (newVal) {
                 setState(() => _workTime = newVal < 5 ? 5 : newVal);
               },
@@ -209,7 +268,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
             _buildTimeSelector(
               "TIEMPO DE DESCANSO",
               _restTime,
-              Colors.greenAccent,
+              Theme.of(context).colorScheme.secondary,
               (newVal) {
                 setState(() => _restTime = newVal < 5 ? 5 : newVal);
               },
