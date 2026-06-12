@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.gym_app"
+    namespace = "com.dev.eahc.replift"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 

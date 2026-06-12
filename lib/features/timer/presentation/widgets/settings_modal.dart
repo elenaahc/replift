@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gym_app/core/theme.dart';
 import 'package:gym_app/core/theme_provider.dart';
+import 'package:gym_app/features/timer/providers/stats_provider.dart';
 import '../../providers/timer_notifier.dart';
 
 class SettingsModal extends ConsumerStatefulWidget {
@@ -15,6 +16,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
   late int _workTime;
   late int _restTime;
   late int _sets;
+  late int _targetGoal;
 
   @override
   void initState() {
@@ -23,6 +25,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
     _workTime = notifier.workTime;
     _restTime = notifier.restTime;
     _sets = notifier.initialSets;
+    _targetGoal = ref.read(statsProvider).targetRoutines;
   }
 
   // Interfaz de columnas tipo "Reloj" para ajustar minutos y segundos por separado
@@ -123,7 +126,7 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
   // El selector de sets se mantiene horizontal porque los números son pequeños
   Widget _buildSetsSelector() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Column(
         children: [
           const Text(
@@ -171,6 +174,53 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTargetSelector() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 5.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "META MENSUAL",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white70,
+                ),
+              ),
+              // Mostramos el valor actual dinámicamente
+              Text(
+                "$_targetGoal rutinas",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Slider(
+          value: _targetGoal.toDouble().clamp(10.0, 100.0),
+          min: 10,
+          max: 100,
+          divisions:
+              18, // Esto hace que salte de 5 en 5 (10, 15, 20... hasta 100)
+          label: _targetGoal.toString(),
+          activeColor: Theme.of(context).colorScheme.primary,
+          inactiveColor: Colors.white24,
+          onChanged: (double value) {
+            setState(() {
+              _targetGoal = value.round();
+            });
+          },
+        ),
+      ],
     );
   }
 
@@ -278,6 +328,8 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
 
             _buildSetsSelector(),
 
+            _buildTargetSelector(),
+
             const SizedBox(height: 5),
 
             // Botón Inmenso de Guardado
@@ -293,6 +345,8 @@ class _SettingsModalState extends ConsumerState<SettingsModal> {
                         rest: _restTime,
                         sets: _sets,
                       );
+
+                  ref.read(statsProvider.notifier).updateTarget(_targetGoal);
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
