@@ -1,4 +1,4 @@
-package com.example.gym_app
+package com.dev.eahc.replift
 
 import io.flutter.embedding.android.FlutterActivity
 
